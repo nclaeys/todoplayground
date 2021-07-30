@@ -1,0 +1,2 @@
+curl -X POST "http://localhost:5000/todos" -H "Content-Type: application/json" -d '{ "day":"30-07-2021","title":"second todo"}'
+curl -X GET "http://localhost:5000/todos"
