@@ -1,19 +1,13 @@
-from flask import request, json, Flask
-from app.utils import to_date
+from flask import request, json, jsonify
 from app import app
-
-db = [
-    {
-        'day': to_date('10-07-2021'),
-        'title': 'My first todo'
-    }
-]
+from app.models import Todo
 
 
 @app.route("/todos", methods=['GET'])
 def todos():
-    all_todos = {'todos': db}
-    return json.dumps(all_todos)
+    all = Todo.get_all()
+    print(all)
+    return jsonify(all)
 
 
 @app.route("/todos", methods=["POST"])
@@ -21,16 +15,14 @@ def add_todo():
     content = request.get_json()
     print(content)
     try:
-        date = to_date(content["day"])
+        new_todo = Todo(content['day'], content['title'])
+        new_todo.insert()
+        return jsonify(new_todo.json())
     except ValueError:
-        return json.dumps({"message": "failed to parse date"})
-
-    new_todo = {"title": content['title'], "day": date}
-    db.append(new_todo)
-    return json.dumps(new_todo)
+        return jsonify({"message": "failed to parse date"})
 
 
 @app.route("/todos/by_day/<string:day>")
 def get_todo_day(day):
-    todos_for_day = [todo for todo in db if todo["day"].toordinal() == to_date(day).toordinal()]
-    return json.dumps({"todos": todos_for_day})
+    todos_for_day = Todo.query_by_day(day)
+    return jsonify({"todos": todos_for_day})
