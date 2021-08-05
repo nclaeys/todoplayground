@@ -15,7 +15,7 @@ def add_todo():
     content = request.get_json()
     print(content)
     try:
-        new_todo = Todo(content['day'], content['title'])
+        new_todo = Todo(content['user'], content['day'], content['title'])
         new_todo.insert()
         return jsonify(new_todo.json())
     except ValueError:
@@ -26,3 +26,9 @@ def add_todo():
 def get_todo_day(day):
     todos_for_day = Todo.query_by_day(day)
     return jsonify({"todos": todos_for_day})
+
+
+@app.route("/todos/by_user/<string:user>")
+def get_by_user(user):
+    todos_by_user = Todo.query_by_user(user)
+    return jsonify({"todos": todos_by_user})
